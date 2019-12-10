@@ -26,7 +26,6 @@ with open(infile, 'r') as f, open('wgs_exome_results.tsv', 'w') as o:
     o_writer.writeheader()
 
     for line in fh:
-        last_line = fh.line_num
 
         line['WGS_Exome'] = 'Fail'
         if 'FREEMIX' not in line['QC Failed Metrics']:
