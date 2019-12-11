@@ -7,34 +7,41 @@ ccdg_wgs_exome_eval.py
 
 Determine 1x sample status, Fail, WGS topup or Exome.
 
+infile format: 2859333.85.120219.build38.all.tsv
 Usage:
 
-python3 ccdg_wgs_exome_eval.py <infile>
+python3 ccdg_wgs_exome_eval.py <infile> 
+python3 ccdg_wgs_exome_eval.py <infile>,<infile2>,<infile3>...
 
 Results outfile: 
-wgs_exome_results.tsv
+2859333.85.120219.wgs_exome_results.tsv
 """
 
-infile = sys.argv[1]
-if not os.path.isfile(infile):
-    sys.exit('{} file not found.'.format(infile))
+for infile in sys.argv[1].split(','):
 
-with open(infile, 'r') as f, open('wgs_exome_results.tsv', 'w') as o:
+    if not os.path.isfile(infile):
+        sys.exit('{} file not found.'.format(infile))
 
-    fh = csv.DictReader(f, delimiter='\t')
-    o_writer = csv.DictWriter(o, fieldnames=fh.fieldnames + ['WGS_Exome'], delimiter='\t')
-    o_writer.writeheader()
+    assert len(infile.split('.')[:3]) == 3, '<infile> format not correct.'
 
-    for line in fh:
+    outfile = '{}.wgs_exome_results.tsv'.format('.'.join(infile.split('.')[:3]))
 
-        line['WGS_Exome'] = 'Fail'
-        if 'FREEMIX' not in line['QC Failed Metrics']:
-            if float(line['HAPLOID_COVERAGE']) >= 0.85 and float(line['ALIGNMENT_RATE']) >= 0.85:
-                line['WGS_Exome'] = 'WGS_Topup'
-            else:
-                line['WGS_Exome'] = 'Exome'
+    with open(infile, 'r') as f, open(outfile, 'w') as o:
 
-        o_writer.writerow(line)
+        fh = csv.DictReader(f, delimiter='\t')
+        o_writer = csv.DictWriter(o, fieldnames=fh.fieldnames + ['WGS_Exome'], delimiter='\t')
+        o_writer.writeheader()
+
+        for line in fh:
+
+            line['WGS_Exome'] = 'Fail'
+            if 'FREEMIX' not in line['QC Failed Metrics']:
+                if float(line['HAPLOID_COVERAGE']) >= 0.85 and float(line['ALIGNMENT_RATE']) >= 0.85:
+                    line['WGS_Exome'] = 'WGS_Topup'
+                else:
+                    line['WGS_Exome'] = 'Exome'
+
+            o_writer.writerow(line)
 
 
 
