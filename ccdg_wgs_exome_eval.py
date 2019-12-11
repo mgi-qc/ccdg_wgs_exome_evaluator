@@ -36,7 +36,7 @@ for infile in sys.argv[1].split(','):
 
             line['WGS_Exome'] = 'Fail'
             if 'FREEMIX' not in line['QC Failed Metrics']:
-                if float(line['HAPLOID_COVERAGE']) >= 0.85 and float(line['ALIGNMENT_RATE']) >= 0.85:
+                if 'HAPLOID_COVERAGE' in line['QC Failed Metrics'] and float(line['ALIGNMENT_RATE']) >= 0.85:
                     line['WGS_Exome'] = 'WGS_Topup'
                 else:
                     line['WGS_Exome'] = 'Exome'
